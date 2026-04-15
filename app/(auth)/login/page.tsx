@@ -23,10 +23,11 @@ export default function LoginPage() {
 
     try {
       // 2. Autentikasi dengan Supabase Auth menggunakan email dan password
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
       // Menampilkan pesan error ramah jika autentikasi gagal
       if (authError || !authData.user) {
@@ -65,7 +66,6 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       {/* Kartu Form - Styling profesional, clean dengan border-radius (rounded) dan shadow */}
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 space-y-6">
-        
         {/* Header Kartu: Logo / Nama Dashboard */}
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
@@ -86,7 +86,10 @@ export default function LoginPage() {
         {/* Form Login */}
         <form onSubmit={handleLogin} className="space-y-5 mt-8">
           <div>
-            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label
+              htmlFor="email"
+              className="block text-sm font-semibold text-gray-700 mb-1.5"
+            >
               Email Petugas
             </label>
             <input
@@ -102,7 +105,10 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label
+              htmlFor="password"
+              className="block text-sm font-semibold text-gray-700 mb-1.5"
+            >
               Kata Sandi
             </label>
             <input

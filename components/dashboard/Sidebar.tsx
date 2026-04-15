@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { House, Users, HandHeart, Calendar, FileText, Wallet } from "lucide-react";
+import {
+  House,
+  Users,
+  HandHeart,
+  Calendar,
+  FileText,
+  Wallet,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const menuItems = [
@@ -36,7 +43,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 w-[240px] transform bg-[#14532d] text-white transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0",
-          isOpen ? "translate-x-0" : "-translate-x-full" // Menampilkan sidebar di mobile berdasarkan state
+          isOpen ? "translate-x-0" : "-translate-x-full", // Menampilkan sidebar di mobile berdasarkan state
         )}
       >
         {/* Logo / Nama Aplikasi */}
@@ -48,11 +55,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         <nav className="mt-6 px-4 space-y-1">
           {menuItems.map((item) => {
             // Logika untuk mendeteksi menu aktif
-            const isActive = 
-              item.href === "/dashboard" 
+            const isActive =
+              item.href === "/dashboard"
                 ? pathname === "/dashboard" // Khusus '/dashboard' butuh exact match
                 : pathname.startsWith(item.href); // Menu lain menggunakan startsWith agar sub-page tetap ber-background aktif
-            
+
             return (
               <Link
                 key={item.name}
@@ -67,10 +74,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   isActive
                     ? "bg-[#15803d] text-white" // Warna aktif hijau tua
-                    : "text-gray-300 hover:bg-[#15803d]/50 hover:text-white"
+                    : "text-gray-300 hover:bg-[#15803d]/50 hover:text-white",
                 )}
               >
-                <item.icon className="h-5 w-5 flex-shrink-0" />
+                <item.icon className="h-5 w-5 shrink-0" />
                 {item.name}
               </Link>
             );

@@ -1,19 +1,52 @@
-import { LayoutDashboard } from "lucide-react";
-import Image from "next/image";
+import { Suspense } from "react";
+import { createClient } from "@/lib/supabase/server";
+import { Greeting } from "@/components/dashboard/Greeting";
+import { StatCards, StatCardsSkeleton } from "@/components/dashboard/stat-cards";
+import { RecentSuratTable, TableSkeleton } from "@/components/dashboard/recent-surat-table";
+import { UpcomingKegiatanTable } from "@/components/dashboard/upcoming-kegiatan-table";
 
-export default function Home() {
+export default async function DashboardOverview() {
+  const supabase = await createClient();
+
+  // Ambil data user aktif
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Ambil nama dari tabel profiles
+  let userName = "Pengguna";
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("nama")
+      .eq("id", user.id)
+      .single();
+
+    if (profile?.nama) {
+      userName = profile.nama;
+    }
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center py-20 px-4 text-center rounded-2xl border-2 border-dashed border-gray-200 bg-white shadow-sm min-h-[60vh]">
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-50 mb-6">
-        <LayoutDashboard className="h-8 w-8 text-green-700" />
+    <div className="space-y-8">
+      {/* 1. Header & Sapaan Dinamis */}
+      <Greeting userName={userName} />
+
+      {/* 2. Kartu Statistik Utama (dimuat mandiri) */}
+      <Suspense fallback={<StatCardsSkeleton />}>
+        <StatCards />
+      </Suspense>
+
+      {/* 3. Area Tabel (dimuat mandiri masing-masing) */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        <Suspense fallback={<TableSkeleton />}>
+          <RecentSuratTable />
+        </Suspense>
+
+        <Suspense fallback={<TableSkeleton />}>
+          <UpcomingKegiatanTable />
+        </Suspense>
       </div>
-      <h1 className="text-3xl font-bold text-gray-800 tracking-tight mb-3">
-        Dashboard
-      </h1>
-      <p className="text-lg text-gray-500 max-w-md">
-        Halaman ini sedang dalam pengembangan. Silakan kembali lagi nanti untuk
-        pembaruan fitur ini.
-      </p>
     </div>
   );
 }

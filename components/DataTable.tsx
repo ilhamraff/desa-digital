@@ -1,23 +1,23 @@
-'use client'
+"use client";
 
-import React from 'react'
-import { Eye, Pencil, Trash2, Database } from 'lucide-react'
+import React from "react";
+import { Eye, Pencil, Trash2, Database } from "lucide-react";
 
 // Interface untuk definisi struktur kolom
 export interface Column<T> {
-  key: keyof T | string
-  label: string
-  render?: (value: unknown, row: T) => React.ReactNode
+  key: keyof T | string;
+  label: string;
+  render?: (value: unknown, row: T) => React.ReactNode;
 }
 
 // Interface untuk props dari DataTable, menggunakan generic T untuk tipe data baris
 export interface DataTableProps<T> {
-  columns: Column<T>[]
-  data: T[]
-  isLoading?: boolean
-  onEdit?: (row: T) => void
-  onDelete?: (row: T) => void
-  onView?: (row: T) => void
+  columns: Column<T>[];
+  data: T[];
+  isLoading?: boolean;
+  onEdit?: (row: T) => void;
+  onDelete?: (row: T) => void;
+  onView?: (row: T) => void;
 }
 
 export function DataTable<T>({
@@ -30,7 +30,7 @@ export function DataTable<T>({
 }: DataTableProps<T>) {
   // Mengecek apakah kolom aksi perlu ditampilkan
   // Kolom aksi muncul jika salah satu dari onEdit, onDelete, atau onView di-provide
-  const hasActions = !!(onEdit || onDelete || onView)
+  const hasActions = !!(onEdit || onDelete || onView);
 
   return (
     <div className="w-full bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
@@ -40,22 +40,26 @@ export function DataTable<T>({
           <thead className="bg-[#166534] text-white">
             <tr>
               {columns.map((col, index) => (
-                <th key={String(col.key) + index} className="px-6 py-4 font-medium">
+                <th
+                  key={String(col.key) + index}
+                  className="px-6 py-4 font-medium"
+                >
                   {col.label}
                 </th>
               ))}
               {hasActions && (
-                <th className="px-6 py-4 font-medium text-right">
-                  Aksi
-                </th>
+                <th className="px-6 py-4 font-medium text-right">Aksi</th>
               )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-200 text-gray-900">
             {/* State Loading: Menampilkan 5 baris skeleton shimmer rata-rata */}
             {isLoading ? (
               Array.from({ length: 5 }).map((_, rowIndex) => (
-                <tr key={`skeleton-${rowIndex}`} className="animate-pulse odd:bg-white even:bg-gray-50">
+                <tr
+                  key={`skeleton-${rowIndex}`}
+                  className="animate-pulse odd:bg-white even:bg-gray-50"
+                >
                   {columns.map((col, colIndex) => (
                     <td key={`skeleton-col-${colIndex}`} className="px-6 py-4">
                       <div className="h-4 bg-gray-200 rounded w-3/4"></div>
@@ -73,8 +77,8 @@ export function DataTable<T>({
             ) : data.length === 0 ? (
               /* State Kosong */
               <tr>
-                <td 
-                  colSpan={columns.length + (hasActions ? 1 : 0)} 
+                <td
+                  colSpan={columns.length + (hasActions ? 1 : 0)}
                   className="px-6 py-12 text-center text-gray-500"
                 >
                   <div className="flex flex-col items-center justify-center gap-2">
@@ -86,18 +90,23 @@ export function DataTable<T>({
             ) : (
               /* State Data Ditemukan */
               data.map((row, rowIndex) => (
-                <tr 
-                  key={rowIndex} 
+                <tr
+                  key={rowIndex}
                   className="group odd:bg-white even:bg-gray-50 hover:bg-gray-100 transition-colors duration-200"
                 >
                   {columns.map((col, colIndex) => {
-                    const value = row[col.key as keyof T]
+                    const value = row[col.key as keyof T];
                     return (
-                      <td key={String(col.key) + colIndex} className="px-6 py-4">
+                      <td
+                        key={String(col.key) + colIndex}
+                        className="px-6 py-4"
+                      >
                         {/* Jika ada fungsi render kustom, gunakan itu. Jika tidak, konversi value ke node */}
-                        {col.render ? col.render(value, row) : (value as React.ReactNode)}
+                        {col.render
+                          ? col.render(value, row)
+                          : (value as React.ReactNode)}
                       </td>
-                    )
+                    );
                   })}
                   {hasActions && (
                     <td className="px-6 py-4 text-right">
@@ -139,5 +148,5 @@ export function DataTable<T>({
         </table>
       </div>
     </div>
-  )
+  );
 }

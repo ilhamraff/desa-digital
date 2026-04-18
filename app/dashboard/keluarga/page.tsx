@@ -1,17 +1,43 @@
-import { Wrench } from "lucide-react";
+import { Suspense } from "react";
+import { createClient } from "@/lib/supabase/server";
+import KeluargaClient from "./KeluargaClient";
 
-export default function DataKeluargaPage() {
+export const metadata = {
+  title: "Data Keluarga - Desa Digital",
+};
+
+// Component asinkron untuk fetch data awal
+async function KeluargaDataFetcher() {
+  const supabase = await createClient();
+  
+  // Mengambil semua data dari tabel keluarga dengan menyertakan count anggota
+  const { data, error } = await supabase
+    .from("keluarga")
+    .select("*, anggota(count)")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching data keluarga:", error);
+    // Memberikan array kosong jika error terjadi agar UI aman
+  }
+
+  return <KeluargaClient initialData={data || []} />;
+}
+
+export default function KeluargaPage() {
   return (
-    <div className="flex flex-col items-center justify-center py-20 px-4 text-center rounded-2xl border-2 border-dashed border-gray-200 bg-white shadow-sm min-h-[60vh]">
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-50 mb-6">
-        <Wrench className="h-8 w-8 text-green-700" />
-      </div>
-      <h1 className="text-3xl font-bold text-gray-800 tracking-tight mb-3">
-        Data Keluarga
-      </h1>
-      <p className="text-lg text-gray-500 max-w-md">
-        Halaman ini sedang dalam pengembangan. Silakan kembali lagi nanti untuk pembaruan fitur ini.
-      </p>
-    </div>
+    <main className="p-6">
+      {/* 5. Suspense untuk loading state */}
+      <Suspense 
+        fallback={
+          <div className="flex flex-col items-center justify-center min-h-[400px] text-gray-500 space-y-4">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-600"></div>
+            <p className="text-sm font-medium">Memuat data keluarga...</p>
+          </div>
+        }
+      >
+        <KeluargaDataFetcher />
+      </Suspense>
+    </main>
   );
 }

@@ -12,3 +12,6 @@ export interface ProgramSummary {
   periode: string;
   aktif: boolean;
 }
+
+// re-export agar komponen internal cukup import dari satu file
+export { formatRupiah } from "@/lib/utils";

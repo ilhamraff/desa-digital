@@ -11,6 +11,7 @@ export interface ProgramSummary {
   jumlah_bantuan: number;
   periode: string;
   aktif: boolean;
+  catatan?: string | null;
 }
 
 // re-export agar komponen internal cukup import dari satu file

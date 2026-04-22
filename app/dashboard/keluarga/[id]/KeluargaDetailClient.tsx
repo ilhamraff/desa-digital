@@ -14,12 +14,15 @@ import {
   Map,
   Calendar,
   Printer,
+  Download,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/hooks/useToast";
 import { Keluarga, Anggota } from "@/types";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { ModalAnggota } from "@/components/keluarga/ModalAnggota";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export interface KeluargaDetail extends Keluarga {
   anggota: Anggota[];
@@ -131,6 +134,51 @@ export default function KeluargaDetailClient({
     return nik.substring(0, 4) + "********" + nik.substring(12, 16);
   };
 
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+
+    // Header
+    doc.setFontSize(16);
+    doc.text("DATA KARTU KELUARGA", 14, 20);
+
+    doc.setFontSize(10);
+    doc.text(`Nomor KK       : ${initialData.no_kk}`, 14, 30);
+    doc.text(`Kepala Keluarga: ${initialData.nama_kepala}`, 14, 36);
+    doc.text(`Alamat         : ${initialData.alamat}`, 14, 42);
+    doc.text(`RT/RW          : ${initialData.rt}/${initialData.rw}`, 14, 48);
+
+    const tableColumn = [
+      "No",
+      "Nama",
+      "NIK",
+      "Hubungan",
+      "Jenis Kelamin",
+      "Usia",
+      "Tgl Lahir",
+    ];
+    const tableRows = initialData.anggota.map((a, index) => [
+      index + 1,
+      a.nama,
+      maskNik(a.nik), // Tetap di-masking untuk keamanan PDF
+      a.hubungan,
+      a.jenis_kelamin === "L" ? "Laki-laki" : "Perempuan",
+      `${calculateAge(a.tgl_lahir)} Tahun`,
+      formatTanggal(a.tgl_lahir),
+    ]);
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 56,
+      theme: "grid",
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [37, 99, 235] }, // Tailwind blue-600
+    });
+
+    const fileName = `Data_Keluarga_${initialData.no_kk}.pdf`;
+    doc.save(fileName);
+  };
+
   const renderBadgeHubungan = (hubungan: string) => {
     const defaultClasses =
       "px-2.5 py-0.5 rounded-full text-xs font-medium border";
@@ -183,8 +231,12 @@ export default function KeluargaDetailClient({
 
       {/* HEADER KOP SURAT (PRINT ONLY) */}
       <div className="hidden print:block text-center border-b-[3px] border-black pb-4 mb-8 text-black">
-        <h1 className="text-xl font-bold uppercase tracking-wider">Pemerintah Desa Digital</h1>
-        <p className="text-sm">Kecamatan Inovasi, Kabupaten Teknologi, Provinsi Masa Depan</p>
+        <h1 className="text-xl font-bold uppercase tracking-wider">
+          Pemerintah Desa Digital
+        </h1>
+        <p className="text-sm">
+          Kecamatan Inovasi, Kabupaten Teknologi, Provinsi Masa Depan
+        </p>
       </div>
       <div className="hidden print:block text-center text-lg font-bold text-black mb-6 underline uppercase tracking-wide">
         Data Kartu Keluarga
@@ -204,14 +256,15 @@ export default function KeluargaDetailClient({
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden print:shadow-none print:border-none print:rounded-none">
         <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:p-0 print:border-none print:mb-4">
           <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2 print:text-black">
-            <IdCard className="w-6 h-6 text-green-600 print:hidden" /> Profil Kepala Keluarga
+            <IdCard className="w-6 h-6 text-green-600 print:hidden" /> Profil
+            Kepala Keluarga
           </h2>
           <div className="flex items-center gap-3 print:hidden">
             <button
-              onClick={() => window.print()}
+              onClick={handleExportPDF}
               className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-colors shadow-sm"
             >
-              <Printer className="w-4 h-4" /> Cetak / Print
+              <Download className="w-4 h-4" /> Download PDF
             </button>
             <Link
               href={`/dashboard/keluarga/${initialData.id}/edit`}
@@ -276,8 +329,8 @@ export default function KeluargaDetailClient({
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mt-6 print:shadow-none print:border-none print:rounded-none print:mt-10">
         <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:p-0 print:border-none print:mb-4">
           <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2 print:text-black">
-            <Users className="w-6 h-6 text-blue-600 print:hidden" /> Anggota Keluarga (
-            {initialData.anggota.length} orang)
+            <Users className="w-6 h-6 text-blue-600 print:hidden" /> Anggota
+            Keluarga ({initialData.anggota.length} orang)
           </h2>
           <button
             onClick={handleOpenAddAnggota}
@@ -397,9 +450,17 @@ export default function KeluargaDetailClient({
 
       {/* FOOTER PRINT ONLY */}
       <div className="hidden print:block mt-12 pt-4 border-t border-gray-300 text-sm text-black">
-        <p>Dicetak pada: {new Date().toLocaleString("id-ID", {
-          year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit"
-        })} WIB</p>
+        <p>
+          Dicetak pada:{" "}
+          {new Date().toLocaleString("id-ID", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })}{" "}
+          WIB
+        </p>
       </div>
 
       {/* MODAL 1: Tambah / Edit Anggota */}

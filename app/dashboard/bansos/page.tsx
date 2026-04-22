@@ -45,24 +45,32 @@ async function BansosDataFetcher() {
   const programMap = new Map<string, ProgramSummary>();
 
   for (const item of bansosData) {
+    const isDef = !item.penerima_id;
     const existing = programMap.get(item.nama_program);
+
     if (existing) {
-      existing.total_penerima += 1;
+      if (!isDef) {
+        existing.total_penerima += 1;
+        // Tandai aktif jika masih ada penerima dengan status pending
+        if (item.status === "pending") {
+          existing.aktif = true;
+        }
+      } else {
+        // Jika ini adalah row definisi, override detail program
+        existing.jumlah_bantuan = item.jumlah_bantuan;
+        existing.catatan = item.catatan || existing.catatan;
+        existing.aktif = item.status === "pending"; // definisi mengontrol status global jika ada
+      }
     } else {
       programMap.set(item.nama_program, {
         nama_program: item.nama_program,
-        total_penerima: 1,
+        total_penerima: isDef ? 0 : 1,
         jumlah_bantuan: item.jumlah_bantuan,
         periode: item.periode,
-        // Tandai aktif jika masih ada penerima dengan status pending
+        // Aktif default ke pending
         aktif: item.status === "pending",
+        catatan: item.catatan || null,
       });
-    }
-
-    // Jika ada satu saja yang masih pending, program dianggap aktif
-    if (item.status === "pending") {
-      const prog = programMap.get(item.nama_program);
-      if (prog) prog.aktif = true;
     }
   }
 

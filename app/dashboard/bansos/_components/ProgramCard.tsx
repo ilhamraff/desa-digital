@@ -1,6 +1,6 @@
 "use client";
 
-import { HandHeart, Pencil } from "lucide-react";
+import { HandHeart, Pencil, UserPlus } from "lucide-react";
 import { ProgramSummary } from "./bansos.types";
 import { formatRupiah } from "@/lib/utils";
 
@@ -8,12 +8,16 @@ interface ProgramCardProps {
   program: ProgramSummary;
   isSelected: boolean;
   onLihatPenerima: (nama: string) => void;
+  onAddPenerima?: (nama: string) => void;
+  onEditProgram?: (program: ProgramSummary) => void;
 }
 
 export function ProgramCard({
   program,
   isSelected,
   onLihatPenerima,
+  onAddPenerima,
+  onEditProgram,
 }: ProgramCardProps) {
   return (
     <div
@@ -48,12 +52,22 @@ export function ProgramCard({
               <p className="text-xs text-gray-400 mt-0.5">{program.periode}</p>
             </div>
           </div>
-          <button
-            title="Edit Program"
-            className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors shrink-0"
-          >
-            <Pencil className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => onAddPenerima && onAddPenerima(program.nama_program)}
+              title="Tambah Penerima"
+              className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors shrink-0"
+            >
+              <UserPlus className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => onEditProgram && onEditProgram(program)}
+              title="Edit Program"
+              className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors shrink-0"
+            >
+              <Pencil className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Stats */}

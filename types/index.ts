@@ -35,7 +35,7 @@ export interface Anggota {
 export interface Bansos {
   id: string; // uuid
   nama_program: string;
-  penerima_id: string; // FK to profiles
+  penerima_id: string | null; // FK to profiles, null means it's a program definition row
   jumlah_bantuan: number;
   periode: string;
   status: "pending" | "tersalurkan";

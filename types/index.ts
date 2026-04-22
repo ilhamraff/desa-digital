@@ -52,10 +52,23 @@ export interface Kegiatan {
   waktu_mulai: string; // time format, e.g. 'HH:mm'
   waktu_selesai: string; // time format, e.g. 'HH:mm'
   lokasi: string;
-  kuota: number;
+  kuota: number | null;
   status: "aktif" | "selesai" | "dibatalkan";
+  catatan_tambahan?: string | null;
+  alasan_batal?: string | null;
   created_at: string;
   updated_at: string;
+  peserta_kegiatan?: { count: number }[];
+}
+
+export interface PesertaKegiatan {
+  id: string; // uuid
+  kegiatan_id: string; // FK to kegiatan
+  warga_id: string; // FK to profiles
+  waktu_daftar: string; // timestamptz
+  catatan?: string | null;
+  created_at: string; // timestamptz
+  profiles?: Profile; // Relasi ke tabel profiles
 }
 
 export interface Surat {

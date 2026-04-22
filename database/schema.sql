@@ -97,6 +97,8 @@ CREATE TABLE kegiatan (
     lokasi TEXT,
     kuota INTEGER,
     status TEXT CHECK (status IN ('aktif', 'selesai', 'dibatalkan')) DEFAULT 'aktif',
+    catatan_tambahan TEXT,
+    alasan_batal TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

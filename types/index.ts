@@ -78,7 +78,7 @@ export interface Surat {
   keperluan: string;
   status: "pending" | "diproses" | "selesai" | "ditolak";
   catatan_petugas?: string | null;
-  file_url?: string | null;
+  file_urls?: string[] | null;
   created_at: string;
   updated_at: string;
 }

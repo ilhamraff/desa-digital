@@ -8,6 +8,36 @@ import { Kegiatan } from "@/types";
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import { StatusBadge } from "@/components/StatusBadge";
 
+const getRecurringDates = (startDateStr: string, freq: string, count: number) => {
+  if (!startDateStr) return [];
+  const dates = [];
+  
+  const [year, month, day] = startDateStr.split("-").map(Number);
+  const start = new Date(year, month - 1, day);
+  
+  dates.push(new Date(start)); // Original date
+  
+  for (let i = 1; i <= count; i++) {
+    const nextDate = new Date(start);
+    if (freq === "mingguan") {
+      nextDate.setDate(start.getDate() + i * 7);
+    } else if (freq === "dua_mingguan") {
+      nextDate.setDate(start.getDate() + i * 14);
+    } else if (freq === "bulanan") {
+      nextDate.setMonth(start.getMonth() + i);
+    }
+    dates.push(nextDate);
+  }
+  return dates;
+};
+
+const formatDate = (d: Date) => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
+
 interface FormKegiatanProps {
   initialData?: Kegiatan;
 }
@@ -40,6 +70,11 @@ export default function FormKegiatan({ initialData }: FormKegiatanProps) {
   const [catatanTambahan, setCatatanTambahan] = useState(
     initialData?.catatan_tambahan || "",
   );
+
+  // Recurring state
+  const [isBerulang, setIsBerulang] = useState(false);
+  const [frekuensi, setFrekuensi] = useState<"mingguan" | "dua_mingguan" | "bulanan">("mingguan");
+  const [jumlahPengulangan, setJumlahPengulangan] = useState(1);
 
   // Validation state
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -93,6 +128,12 @@ export default function FormKegiatan({ initialData }: FormKegiatanProps) {
       }
     }
 
+    if (isBerulang && !isEdit) {
+      if (jumlahPengulangan < 1 || jumlahPengulangan > 12) {
+        newErrors.jumlahPengulangan = "Maksimal pengulangan 12 kali";
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -136,23 +177,44 @@ export default function FormKegiatan({ initialData }: FormKegiatanProps) {
         router.push(`/dashboard/kegiatan`); // atau ke detail
       }
     } else {
-      const { data, error } = await supabase
-        .from("kegiatan")
-        .insert(payload)
-        .select("id")
-        .single();
+      if (isBerulang) {
+        const dates = getRecurringDates(tanggal, frekuensi, jumlahPengulangan);
+        const payloadArray = dates.map((d) => ({
+          ...payload,
+          tanggal: formatDate(d),
+        }));
 
-      if (error) {
-        showToast("error", "Terjadi kesalahan", error.message);
-      } else if (data) {
-        showToast(
-          "success",
-          "Berhasil!",
-          "Kegiatan berhasil dibuat! Sekarang tambahkan peserta.",
-        );
-        // Sesuai requirement, redirect ke halaman detail id-baru
-        // Karena halaman detail mungkin belum ada, sementara redirect ke list atau id tersebut
-        router.push(`/dashboard/kegiatan`);
+        const { error } = await supabase.from("kegiatan").insert(payloadArray);
+
+        if (error) {
+          showToast("error", "Terjadi kesalahan", error.message);
+        } else {
+          showToast(
+            "success",
+            "Berhasil!",
+            `${payloadArray.length} kegiatan berhasil dibuat sekaligus!`,
+          );
+          router.push(`/dashboard/kegiatan`);
+        }
+      } else {
+        const { data, error } = await supabase
+          .from("kegiatan")
+          .insert(payload)
+          .select("id")
+          .single();
+
+        if (error) {
+          showToast("error", "Terjadi kesalahan", error.message);
+        } else if (data) {
+          showToast(
+            "success",
+            "Berhasil!",
+            "Kegiatan berhasil dibuat! Sekarang tambahkan peserta.",
+          );
+          // Sesuai requirement, redirect ke halaman detail id-baru
+          // Karena halaman detail mungkin belum ada, sementara redirect ke list atau id tersebut
+          router.push(`/dashboard/kegiatan`);
+        }
       }
     }
 
@@ -340,6 +402,87 @@ export default function FormKegiatan({ initialData }: FormKegiatanProps) {
               Pengaturan Tambahan
             </h3>
             <div className="space-y-5">
+
+              {!isEdit && (
+                <div className="bg-gray-50 p-5 rounded-xl border border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium text-gray-900">Jadwalkan sebagai kegiatan berulang</h4>
+                      <p className="text-sm text-gray-500">Buat beberapa kegiatan sekaligus secara rutin</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only peer"
+                        checked={isBerulang}
+                        onChange={(e) => setIsBerulang(e.target.checked)}
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#166534]"></div>
+                    </label>
+                  </div>
+
+                  {isBerulang && (
+                    <div className="space-y-4 pt-4 mt-4 border-t border-gray-200">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Frekuensi
+                          </label>
+                          <select
+                            value={frekuensi}
+                            onChange={(e) => setFrekuensi(e.target.value as any)}
+                            className="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                          >
+                            <option value="mingguan">Mingguan</option>
+                            <option value="dua_mingguan">Dua Mingguan</option>
+                            <option value="bulanan">Bulanan</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Jumlah pengulangan
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="12"
+                            value={jumlahPengulangan}
+                            onChange={(e) => setJumlahPengulangan(Number(e.target.value))}
+                            className={`w-full p-2.5 bg-white border rounded-lg focus:border-green-500 focus:ring-1 focus:ring-green-500 ${
+                              errors.jumlahPengulangan ? "border-red-500" : "border-gray-300"
+                            }`}
+                          />
+                          {errors.jumlahPengulangan ? (
+                            <p className="mt-1 text-sm text-red-500">{errors.jumlahPengulangan}</p>
+                          ) : (
+                            <p className="mt-1 text-xs text-gray-500">Maksimal 12 kali pengulangan</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {tanggal && !errors.tanggal && (
+                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                          <p className="text-sm text-blue-800 mb-2 font-medium">
+                            Akan membuat {jumlahPengulangan > 0 ? jumlahPengulangan + 1 : 1} kegiatan:
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {getRecurringDates(tanggal, frekuensi, jumlahPengulangan || 0).map((d, i) => (
+                              <span key={i} className="px-2.5 py-1 bg-white border border-blue-200 rounded-md text-xs text-blue-700 font-medium shadow-sm">
+                                {new Intl.DateTimeFormat("id-ID", {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric"
+                                }).format(d)}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Status Kegiatan

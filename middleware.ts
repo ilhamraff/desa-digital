@@ -47,6 +47,14 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 4. Logika Proteksi Route
+
+  // ATURAN 0: Redirect root '/' ke /dashboard (jika login) atau /login (jika belum)
+  if (pathname === "/") {
+    const url = request.nextUrl.clone();
+    url.pathname = user ? "/dashboard" : "/login";
+    return NextResponse.redirect(url);
+  }
+
   if (pathname.startsWith("/dashboard")) {
     
     // ATURAN 1: Kalau user mengakses /dashboard tapi BELUM LOGIN

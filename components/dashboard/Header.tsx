@@ -3,6 +3,7 @@
 import { Menu, LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, usePathname } from "next/navigation";
+import { LogoIcon } from "@/components/ui/Logo";
 
 interface HeaderProps {
   onOpenSidebar: () => void;
@@ -35,14 +36,17 @@ export function Header({ onOpenSidebar, userName }: HeaderProps) {
   return (
     <header className="flex h-16 w-full items-center justify-between border-b bg-white px-4 sm:px-6">
       {/* Container Kiri: Tombol Menu (Mobile) & Judul Halaman Aktif */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3 sm:gap-4">
         <button
           onClick={onOpenSidebar}
-          className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-md"
+          className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-md cursor-pointer"
           title="Buka Menu"
         >
           <Menu className="h-6 w-6" />
         </button>
+        <div className="lg:hidden flex items-center">
+          <LogoIcon size={30} />
+        </div>
         <h2 className="text-xl font-semibold text-gray-800">{getPageName()}</h2>
       </div>
 

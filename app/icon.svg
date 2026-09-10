@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <!-- Background Gradient: Rich Emerald Forest -->
+    <linearGradient id="desa-bg-app" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="45%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#064e3b" />
+    </linearGradient>
+
+    <!-- Border highlight for subtle glassmorphism -->
+    <linearGradient id="desa-border-app" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.45" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.08" />
+    </linearGradient>
+
+    <!-- Leaf Gradient: Mint to Emerald -->
+    <linearGradient id="leaf-grad-app" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#a7f3d0" />
+      <stop offset="50%" stop-color="#6ee7b7" />
+      <stop offset="100%" stop-color="#34d399" />
+    </linearGradient>
+
+    <!-- Soft Ambient Glow -->
+    <radialGradient id="desa-glow-app" cx="50%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#6ee7b7" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#047857" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Base Squircle -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#desa-bg-app)" stroke="url(#desa-border-app)" stroke-width="1.5" />
+  
+  <!-- Subtle Internal Glow Overlay -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#desa-glow-app)" />
+
+  <!-- Beacon / Smart Signal Point -->
+  <circle cx="32" cy="9.5" r="2.2" fill="#a7f3d0" />
+  <circle cx="32" cy="9.5" r="4.5" stroke="#a7f3d0" stroke-opacity="0.35" stroke-width="1" />
+
+  <!-- Modern Village Roof / Joglo Canopy (Community & Shelter) -->
+  <path
+    d="M 32 14.5 L 49 26.5 L 45.5 30 L 32 20.5 L 18.5 30 L 15 26.5 Z"
+    fill="#ffffff"
+  />
+
+  <!-- Digital Nodes & Connection Lines -->
+  <!-- Left Node & Circuit -->
+  <line x1="20" y1="39" x2="26" y2="39" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round" />
+  <circle cx="20" cy="39" r="3" fill="#6ee7b7" />
+  <circle cx="20" cy="39" r="1.2" fill="#064e3b" />
+
+  <!-- Right Node & Circuit -->
+  <line x1="44" y1="39" x2="38" y2="39" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round" />
+  <circle cx="44" cy="39" r="3" fill="#6ee7b7" />
+  <circle cx="44" cy="39" r="1.2" fill="#064e3b" />
+
+  <!-- Sprout / Leaf (Growth, Agriculture, Village Prosperity) -->
+  <path
+    d="M 32 23.5 C 39.5 29.5 41 38.5 32 47 C 23 38.5 24.5 29.5 32 23.5 Z"
+    fill="url(#leaf-grad-app)"
+  />
+
+  <!-- Core Pulse Center -->
+  <circle cx="32" cy="34" r="2.2" fill="#ffffff" />
+  <line x1="32" y1="36.5" x2="32" y2="44" stroke="#ffffff" stroke-width="2" stroke-linecap="round" />
+</svg>

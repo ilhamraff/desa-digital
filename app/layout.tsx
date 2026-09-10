@@ -6,7 +6,12 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Dashboard Desa Digital",
-  description: "Sistem Informasi Manajemen Desa",
+  description: "Sistem Informasi Manajemen Desa Modern & Terintegrasi",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+  },
 };
 
 export default function RootLayout({

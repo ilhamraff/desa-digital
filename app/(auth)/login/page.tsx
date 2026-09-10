@@ -3,17 +3,34 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, Copy, Check, KeyRound, RotateCcw } from "lucide-react";
+import { Logo } from "@/components/ui/Logo";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("manager@desadigital.com");
+  const [password, setPassword] = useState("password123");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
   const router = useRouter();
 
   // 1. Inisialisasi Supabase client untuk sisi browser (Client Component)
   const supabase = createClient();
+
+  const handleCopy = async (text: string, field: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(null), 2000);
+    } catch {
+      // Fallback jika browser membatasi clipboard API
+    }
+  };
+
+  const handleFillDemo = () => {
+    setEmail("manager@desadigital.com");
+    setPassword("password123");
+  };
 
   // Handler untuk proses submit form
   const handleLogin = async (e: React.FormEvent) => {
@@ -63,18 +80,11 @@ export default function LoginPage() {
 
   return (
     // Background abu muda (bg-gray-50/100) dan penengah layout pada layar Penuh
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
       {/* Kartu Form - Styling profesional, clean dengan border-radius (rounded) dan shadow */}
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 space-y-6">
-        {/* Header Kartu: Logo / Nama Dashboard */}
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-            Dashboard Desa Digital
-          </h1>
-          <p className="text-sm text-gray-500 font-medium">
-            Sistem Informasi Manajemen Desa
-          </p>
-        </div>
+        {/* Header Kartu: Logo / Identitas Desa Digital */}
+        <Logo variant="stacked" size="lg" className="pt-1" />
 
         {/* Notifikasi Error Banner */}
         {error && (
@@ -84,7 +94,7 @@ export default function LoginPage() {
         )}
 
         {/* Form Login */}
-        <form onSubmit={handleLogin} className="space-y-5 mt-8">
+        <form onSubmit={handleLogin} className="space-y-5 mt-6">
           <div>
             <label
               htmlFor="email"
@@ -99,7 +109,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={isLoading}
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#15803d] focus:border-[#15803d] outline-none transition-all disabled:opacity-60"
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#15803d] focus:border-[#15803d] outline-none transition-all disabled:opacity-60 text-gray-900"
               placeholder="nama@desa.go.id"
             />
           </div>
@@ -118,7 +128,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading}
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#15803d] focus:border-[#15803d] outline-none transition-all disabled:opacity-60"
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#15803d] focus:border-[#15803d] outline-none transition-all disabled:opacity-60 text-gray-900"
               placeholder="••••••••"
             />
           </div>
@@ -127,7 +137,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full relative flex items-center justify-center py-3 px-4 rounded-lg text-white font-semibold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#15803d] disabled:opacity-75 disabled:cursor-not-allowed bg-[#15803d] hover:bg-green-800 shadow-md hover:shadow-lg mt-2"
+            className="w-full relative flex items-center justify-center py-3 px-4 rounded-lg text-white font-semibold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#15803d] disabled:opacity-75 disabled:cursor-not-allowed bg-[#15803d] hover:bg-green-800 shadow-md hover:shadow-lg mt-2 cursor-pointer"
           >
             {isLoading ? (
               <>
@@ -135,10 +145,79 @@ export default function LoginPage() {
                 Memproses...
               </>
             ) : (
-              "Masuk"
+              "Masuk ke Dashboard"
             )}
           </button>
         </form>
+
+        {/* Footer / Demo Credentials Card untuk Portfolio Reviewer */}
+        <div className="pt-2 border-t border-gray-100">
+          <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-xl p-4 text-left">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-1.5 text-emerald-900 font-semibold text-xs uppercase tracking-wider">
+                <KeyRound className="w-3.5 h-3.5 text-emerald-700" />
+                <span>Akun Demo Portfolio</span>
+              </div>
+              <button
+                type="button"
+                onClick={handleFillDemo}
+                className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 hover:text-emerald-900 hover:underline cursor-pointer"
+                title="Isi ulang form otomatis"
+              >
+                <RotateCcw className="w-3 h-3" />
+                Isi Otomatis
+              </button>
+            </div>
+
+            <div className="space-y-1.5 font-mono text-xs">
+              {/* Baris Email */}
+              <div className="flex items-center justify-between bg-white/90 px-2.5 py-1.5 rounded-lg border border-emerald-100">
+                <div className="truncate mr-2">
+                  <span className="text-gray-400 font-sans text-[11px] mr-1.5">
+                    Email:
+                  </span>
+                  <span className="text-gray-800 font-medium">
+                    manager@desadigital.com
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleCopy("manager@desadigital.com", "email")}
+                  className="text-gray-500 hover:text-emerald-700 p-1 rounded transition-colors cursor-pointer shrink-0"
+                  title="Salin Email"
+                >
+                  {copiedField === "email" ? (
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5" />
+                  )}
+                </button>
+              </div>
+
+              {/* Baris Password */}
+              <div className="flex items-center justify-between bg-white/90 px-2.5 py-1.5 rounded-lg border border-emerald-100">
+                <div className="truncate mr-2">
+                  <span className="text-gray-400 font-sans text-[11px] mr-1.5">
+                    Pass:
+                  </span>
+                  <span className="text-gray-800 font-medium">password123</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleCopy("password123", "password")}
+                  className="text-gray-500 hover:text-emerald-700 p-1 rounded transition-colors cursor-pointer shrink-0"
+                  title="Salin Password"
+                >
+                  {copiedField === "password" ? (
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5" />
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

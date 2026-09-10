@@ -11,6 +11,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/ui/Logo";
 
 const menuItems = [
   { name: "Dashboard", href: "/dashboard", icon: House },
@@ -47,8 +48,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         )}
       >
         {/* Logo / Nama Aplikasi */}
-        <div className="flex h-16 items-center justify-center border-b border-white/10">
-          <h1 className="text-xl font-bold tracking-wider">Desa Digital</h1>
+        <div className="flex h-16 items-center px-4 border-b border-white/10">
+          <Logo variant="horizontal" theme="dark" size="sm" />
         </div>
 
         {/* Daftar Menu Utama */}
